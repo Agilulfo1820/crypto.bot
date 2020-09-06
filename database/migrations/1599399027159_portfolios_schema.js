@@ -10,6 +10,7 @@ class PortfoliosSchema extends Schema {
       table.integer('user_id').unsigned().notNullable()
           .references('id').inTable('users').onDelete('cascade')
       table.string('slug').unique()
+      table.string('description')
       table.string('api_key').notNullable().unique()
       table.string('api_secret').notNullable()
       table.timestamps()
