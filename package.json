@@ -1,0 +1,48 @@
+{
+  "name": "crypto.bot.api",
+  "version": "0.0.0",
+  "adonis-version": "4.1.0",
+  "description": "Backend for Crypto Bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "adonis serve --dev",
+    "test": "adonis test",
+    "migrate": "adonis migrate"
+  },
+  "keywords": [
+    "adonisjs",
+    "adonis-app"
+  ],
+  "author": "",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@adonisjs/ace": "^5.0.8",
+    "@adonisjs/auth": "^3.0.7",
+    "@adonisjs/bodyparser": "^2.0.5",
+    "@adonisjs/cors": "^1.0.7",
+    "@adonisjs/drive": "^1.0.4",
+    "@adonisjs/fold": "^4.0.9",
+    "@adonisjs/framework": "^5.0.9",
+    "@adonisjs/ignitor": "^2.0.8",
+    "@adonisjs/lucid": "^6.1.3",
+    "@adonisjs/session": "^1.0.27",
+    "@adonisjs/shield": "^1.0.8",
+    "@adonisjs/validator": "^5.0.6",
+    "@adonisjs/vow": "^1.0.17",
+    "@radmen/adonis-lucid-soft-deletes": "^0.2.0",
+    "adonis-acl": "^1.1.1",
+    "adonis-bumblebee": "^2.2.0",
+    "adonis-jsonable": "^0.2.1",
+    "adonis-lucid-polymorphic": "^1.0.1",
+    "adonis-scheduler": "^3.0.2",
+    "adonis-swagger": "^1.2.9",
+    "mariadb": "^2.4.2",
+    "md5-file": "^5.0.0",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {},
+  "autoload": {
+    "App": "./app"
+  }
+}

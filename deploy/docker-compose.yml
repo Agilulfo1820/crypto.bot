@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+  db:
+    container_name: "${SERVICE_PREFIX}-db"
+    build:
+      context: ../.
+      dockerfile: ./deploy/mariadb/Dockerfile
+    env_file:
+      - ../.env
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - mysqldata:/var/lib/mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: "password"
+      MYSQL_DATABASE: "homestead"
+      MYSQL_USER: "homestead"
+      MYSQL_PASSWORD: "password"
+    networks:
+      - api-network
+    restart: always
+    image: crypto.db:latest
+  api:
+    container_name: "${SERVICE_PREFIX}-api"
+    tty: true
+    build:
+      context: ../.
+      dockerfile: ./deploy/api/Dockerfile
+    volumes:
+      - ../.:/srv/app
+      - app_node_modules:/srv/app/node_modules
+    env_file:
+      - ../.env
+    environment:
+      - HOST=0.0.0.0  # listen on all interfaces
+      - SERVER_ENV=development
+    ports:
+      - "8080:8080" # matches actual listener message
+    depends_on:
+      - db
+    networks:
+      - api-network
+    image: crypto.api:latest
+
+networks:
+  api-network:
+    driver: "bridge"
+
+volumes:
+  mysqldata:
+    driver: "local"
+  app_node_modules:

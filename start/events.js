@@ -1,0 +1,1 @@
+const Event = use('Event')
