@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  db:
+  db-crypto:
     container_name: "${SERVICE_PREFIX}-db"
     build:
       context: ../.
@@ -38,7 +38,7 @@ services:
     ports:
       - "8080:8080" # matches actual listener message
     depends_on:
-      - db
+      - db-crypto
     networks:
       - api-network
     image: crypto.api:latest
