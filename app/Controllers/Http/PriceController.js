@@ -2,6 +2,7 @@
 const Binance = require('node-binance-api')
 const Portfolio = use("App/Models/Portfolio")
 const Encryption = use('Encryption')
+var TDSequential = require("tdsequential");
 
 class PriceController {
     /**
@@ -57,6 +58,42 @@ class PriceController {
 
         //Get price
         return await binance.prices()
+    }
+
+    async tdSequentialTest({request, response}) {
+        // Get first portfolio.
+        // We do this only now for test purposes, this is a big security risk
+        const portfolio = await Portfolio.firstOrFail()
+
+        // Initialize binance api
+        const binance = new Binance().options({
+            APIKEY: portfolio.api_key,
+            APISECRET: Encryption.decrypt(portfolio.api_secret)
+        });
+
+        // Get last 500 daily ticks from binance
+        let ticks = await binance.candlesticks("BTCUSDT", "1d", null, {limit: 2})
+
+        // map ticks in ohlc format
+        ticks = ticks.map(function (tick, index){
+                return {
+                    time: tick[0],
+                    open: tick[1],
+                    high: tick[2],
+                    low: tick[3],
+                    close: tick[4],
+                    volume: tick[5]
+                }
+        });
+
+        //sort ticks by date in desc
+        ticks = ticks.reverse()
+
+        // Use TD Sequantial indicator on ticks
+        let result = TDSequential(ticks)
+
+        return result
+
     }
 }
 
