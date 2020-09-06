@@ -17,6 +17,7 @@ const Coin = use('App/Models/Coin')
 const Database = use('Database')
 const uuid = require("uuid/v4")
 const Hash = use('Hash')
+const Encryption = use('Encryption')
 
 class InitialSeeder {
     async run() {
@@ -40,7 +41,7 @@ class InitialSeeder {
                 slug: 'testPortfolio',
                 description: 'Test portfolio with only read permissions',
                 api_key: '2uQAZvjbwwrwqG3Qqbx3XCB43LxRaQw85lPSuoyXGilVfAdfnh2F0mTRjrb7UP4s',
-                api_secret: await Hash.make('sqejRQMHIbbN316cJElzVo758yWyi2KPu8cWVvT0tTKGA2wv511ibd3v6WbVDk6W')
+                api_secret:  Encryption.encrypt('sqejRQMHIbbN316cJElzVo758yWyi2KPu8cWVvT0tTKGA2wv511ibd3v6WbVDk6W')
             })
 
         /**

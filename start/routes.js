@@ -22,3 +22,8 @@ Route.get('/', () => {
         version: require('./../package.json').version
     }
 })
+
+Route.group('Generic', () => {
+    Route.get('/price', 'PriceController.show')
+        .validator('PriceRequests/ShowRequest')
+}).prefix('/api/v1')

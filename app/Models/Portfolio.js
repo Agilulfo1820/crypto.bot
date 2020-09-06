@@ -2,21 +2,19 @@
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model')
-
-/** @type {import('@adonisjs/framework/src/Hash')} */
-const Hash = use('Hash')
+const Encryption = use('Encryption')
 
 class Portfolio extends Model {
     static boot () {
         super.boot()
 
         /**
-         * A hook to hash the api_secret before saving
+         * A hook to encrypt the api_secret before saving
          * it to the database.
          */
         this.addHook('beforeSave', async (portfolioInstance) => {
             if (portfolioInstance.dirty.api_secret) {
-                portfolioInstance.api_secret = await Hash.make(portfolioInstance.api_secret)
+                portfolioInstance.api_secret = Encryption.encrypt(portfolioInstance.api_secret)
             }
         })
     }
