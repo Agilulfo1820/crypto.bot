@@ -23,8 +23,8 @@ Inside windows docker settings, select **Expose daemon on tcp://localhost:2375 w
 4. Run `./develop.sh up` to build the images and start the containers 
 (you can use the `-d` flag to run containers in the background)
 5. Run `./develop.sh bash` to enter the api container. Now you can execute adonis commands.
-6. Run `adonis key:generate` in the bash to generate an App Key
-7. Run `adonis migration:run` to run the migrations
+6. Run `./develop.sh adonis key:generate` in the bash to generate an App Key
+7. Run `./develop.sh mfs` to run the migrations
 
 Now you should be setup and able to use the app. 
 Usually 127.0.0.1:8080 is the host for the api and 127.17.0.1:3307 is the host for mysql.
