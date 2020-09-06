@@ -72,7 +72,7 @@ class PriceController {
         });
 
         // Get last 500 daily ticks from binance
-        let ticks = await binance.candlesticks("BTCUSDT", "1d", null, {limit: 2})
+        let ticks = await binance.candlesticks("BTCUSDT", "1d", null, {limit: 200})
 
         // map ticks in ohlc format
         ticks = ticks.map(function (tick, index){
@@ -86,13 +86,10 @@ class PriceController {
                 }
         });
 
-        //sort ticks by date in desc
-        ticks = ticks.reverse()
-
         // Use TD Sequantial indicator on ticks
         let result = TDSequential(ticks)
 
-        return result
+        return result.reverse()
 
     }
 }
