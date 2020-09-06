@@ -26,4 +26,5 @@ Route.get('/', () => {
 Route.group('Generic', () => {
     Route.get('/price', 'PriceController.show')
         .validator('PriceRequests/ShowRequest')
+    Route.get('/prices', 'PriceController.index')
 }).prefix('/api/v1')
