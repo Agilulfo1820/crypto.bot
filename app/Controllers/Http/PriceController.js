@@ -39,7 +39,7 @@ class PriceController {
 
     /**
      * Return prices for all pairs present on Binance
-     * 
+     *
      * @param request
      * @param response
      * @returns {Promise<*>}
