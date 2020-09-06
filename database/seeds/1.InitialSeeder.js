@@ -13,6 +13,7 @@
 /** @type {import('@adonisjs/lucid/src/Factory')} */
 const Factory = use('Factory')
 const User = use('App/Models/User')
+const Coin = use('App/Models/Coin')
 const Database = use('Database')
 const uuid = require("uuid/v4")
 const Hash = use('Hash')
@@ -59,6 +60,30 @@ class InitialSeeder {
                 {
                     name: 'Tether',
                     symbol: 'USDT'
+                }
+            ])
+
+        console.log('Seeding Coin Pairs')
+        const BTC = await Coin.findBy('symbol', 'BTC')
+        const ETH = await Coin.findBy('symbol', 'ETH')
+        const USDT = await Coin.findBy('symbol', 'USDT')
+        await Database.table('coin_pairs')
+            .insert([
+                {
+                    first_coin_id: BTC.id,
+                    second_coin_id: ETH.id
+                },
+                {
+                    first_coin_id: BTC.id,
+                    second_coin_id: USDT.id
+                },
+                {
+                    first_coin_id: ETH.id,
+                    second_coin_id: USDT.id
+                },
+                {
+                    first_coin_id: ETH.id,
+                    second_coin_id: BTC.id
                 }
             ])
     }
