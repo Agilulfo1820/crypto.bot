@@ -2,6 +2,8 @@
 
 *I requirments che seguiranno sono scritti in stile “Story”, per poter racchiudere in delle microstorie quello che vorremo poter fare con il cryptobot.*
 
+*[Qui](https://app.lucidchart.com/invitations/accept/e74902e5-4a2f-47ec-b745-41186374c52e) è possibile vedere la struttura del database.* 
+
 ## Storia 1
 
 **Dan** ha un **portfolio** (con accesso al suo **account binance**).
