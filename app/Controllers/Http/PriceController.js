@@ -89,6 +89,32 @@ class PriceController {
         // Use TD Sequantial indicator on ticks
         let result = TDSequential(ticks)
 
+        /**
+         * TODO: Logica da introdurre
+         *
+         * if (bearishFlip) {
+         *     vendi se ho qualcosa da vendere
+         * }
+         *
+         * if (bullishFlip) {
+         *     compra, se ho soldi per comprare
+         * }
+         *
+         * if (sellSetupIndex == 8) {
+         *     vendi 50% di quello che ho
+         * }
+         *
+         * if (sellSetupIndex == 9) {
+         *     vendi tutto
+         * }
+         *
+         * Altre logiche:
+         * il 2 verde sopra 1 verde (guardando i TDSTBUY) e il 3 verde sopra 1 verde e 2 verde
+         * il 2 rosso sotto 1 rosso
+         *
+         * Gestire le percentuali di soldi, i soldi investiti, quelli non investiti, etc.
+         */
+
         return result.reverse()
 
     }
