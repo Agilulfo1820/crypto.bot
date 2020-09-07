@@ -28,6 +28,10 @@ class Account extends Model {
     exchange() {
         return this.belongsTo('App/Models/Exchange', 'exchange_id', 'id')
     }
+
+    strategies() {
+        return this.hasMany('App/Models/Strategy', 'id', 'account_id')
+    }
 }
 
 module.exports = Account

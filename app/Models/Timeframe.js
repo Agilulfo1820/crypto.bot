@@ -11,6 +11,10 @@ class Timeframe extends Model {
     static get updatedAtColumn () {
         return null;
     }
+
+    strategies() {
+        return this.hasMany('App/Models/Strategy', 'id', 'timeframe_id')
+    }
 }
 
 module.exports = Timeframe

@@ -11,6 +11,10 @@ class Indicator extends Model {
     static get updatedAtColumn () {
         return null;
     }
+
+    strategies() {
+        return this.hasMany('App/Models/Strategy', 'id', 'indicator_id')
+    }
 }
 
 module.exports = Indicator
