@@ -82,8 +82,9 @@ class TDSequentialJob {
         console.log('Account: ', account.name, account.api_key)
 
         // Retrieve the timeframe of the strategy
-        const timeframe = await strategy.timeframe().fetch()
-        console.log('Timeframe: ', timeframe.value)
+        let timeframe = await strategy.timeframe().fetch()
+        timeframe = timeframe.value + '' + timeframe.range
+        console.log('Timeframe: ', timeframe)
 
         // Initialize binance api
         const binance = new Binance().options({
@@ -94,7 +95,7 @@ class TDSequentialJob {
         // Get last 500 daily ticks from binance
         let ticks
         try {
-            ticks = await binance.candlesticks(assetName, timeframe.value, null, {limit: 200})
+            ticks = await binance.candlesticks(assetName, timeframe, null, {limit: 200})
         } catch (e) {
             console.error('ERROR: ', e)
             return
@@ -147,6 +148,12 @@ class TDSequentialJob {
         // If it's a red two under a red one
         if (secondLastTD.sellSetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)) {
             console.log('SELL: lastTD.buySetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)')
+            SELL = true
+        }
+
+        // If it's a green 9  then sell (or better: if yesterday was a green 8 then sell today)
+        if (secondLastTD.sellCoundownIndex === 8) {
+            console.log('SELL: secondLastTD.sellCoundownIndex')
             SELL = true
         }
 

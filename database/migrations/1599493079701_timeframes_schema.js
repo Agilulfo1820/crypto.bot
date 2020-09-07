@@ -7,7 +7,8 @@ class TimeframesSchema extends Schema {
   up () {
     this.create('timeframes', (table) => {
       table.increments()
-      table.string('value').notNullable()
+      table.integer('value').notNullable()
+      table.string('range').notNullable()
       table.string('slug').unique().notNullable()
       table.string('description')
     })
