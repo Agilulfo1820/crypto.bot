@@ -63,3 +63,7 @@ Ogni *minuto* deve girare un cronjob per ogni specifico indicatore. Questo job d
 ES: Imposto una strategia con indicatore *td* a *1d*. Parte il cronjob e controlla che nell'ultimo giorno questa strategia non è stata azionata. Questa strategia non è stata azionata quindi l'aziona e segue algoritmo della strategia. Il minuto dopo parte dinnuovo il cron e verifica questa volta che la strategia è già stata azionata nell'ultimo giorno quindi non l'aziona. Cosi fino al giorno dopo.
 
 Il cronjob deve creare un job per ogni strategia che trova per quell'indicatore e gestirle tutte contemporaneamente.
+
+## Storia
+
+Se sono un admin all'interno della dashboard posso vedere una sezione per poter aggiungere account (es api binance Binance), poter vedere i propri account, togliere un account.
