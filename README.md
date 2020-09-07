@@ -1,3 +1,9 @@
+## Overview
+
+This project is built on top of [Adonis.js](https://github.com/adonisjs/core) framework. Docker is used to create an image of the app, run all the services and start the app in a more developer friendly way. I recommend using ```develop.sh``` commands for your daily development since it makes it easy to run the app. 
+
+
+The purpose of this app is to automatically trade cryptocurrencies based on a specific strategy that you set.
 ## Requirements
 
 This project uses Docker so, in order to run it, you will only need:
