@@ -64,6 +64,6 @@ ES: Imposto una strategia con indicatore *td* a *1d*. Parte il cronjob e control
 
 Il cronjob deve creare un job per ogni strategia che trova per quell'indicatore e gestirle tutte contemporaneamente.
 
-## Storia
+## Storia 11
 
 Se sono un admin all'interno della dashboard posso vedere una sezione per poter aggiungere account (es api binance Binance), poter vedere i propri account, togliere un account.
