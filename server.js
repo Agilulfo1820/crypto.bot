@@ -17,10 +17,11 @@
 |     Make sure to pass relative path from the project root.
 */
 
-const { Ignitor } = require('@adonisjs/ignitor')
+const {Ignitor} = require('@adonisjs/ignitor')
 
 new Ignitor(require('@adonisjs/fold'))
-  .appRoot(__dirname)
-  .preLoad('start/scheduler')
-  .fireHttpServer()
-  .catch(console.error)
+    .appRoot(__dirname)
+    .preLoad('start/scheduler')
+    .preLoad('start/queue')
+    .fireHttpServer()
+    .catch(console.error)

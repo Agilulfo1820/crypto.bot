@@ -13,28 +13,30 @@ const path = require('path');
 |
 */
 const providers = [
-  '@adonisjs/framework/providers/AppProvider',
-  '@adonisjs/framework/providers/ViewProvider',
-  '@adonisjs/lucid/providers/LucidProvider',
-  '@adonisjs/bodyparser/providers/BodyParserProvider',
-  '@adonisjs/cors/providers/CorsProvider',
-  '@adonisjs/shield/providers/ShieldProvider',
-  '@adonisjs/session/providers/SessionProvider',
-  '@adonisjs/auth/providers/AuthProvider',
-  '@adonisjs/validator/providers/ValidatorProvider',
-  'adonis-bumblebee/providers/BumblebeeProvider',
-  'adonis-acl/providers/AclProvider',
-  'adonis-swagger/providers/SwaggerProvider',
-  path.join(__dirname, '..', 'providers', 'Validators/ExistsValidator'),
-  'adonis-scheduler/providers/SchedulerProvider',
-  path.join(__dirname, '..', 'providers', 'RouteBinding/RouteModelBindingProvider'),
-  'adonis-jsonable/providers/JsonableProvider',
-  path.join(__dirname, '..', 'providers', 'Validators/DateFormatValidator'),
-  '@adonisjs/drive/providers/DriveProvider',
-  'adonis-lucid-polymorphic/providers/PolymorphicProvider',
-  '@radmen/adonis-lucid-soft-deletes/providers/SoftDeletesProvider',
-  path.join(__dirname, '..', 'providers', 'Validators/NotExistsValidator'),
-  '@adonisjs/cors/providers/CorsProvider'
+    '@adonisjs/framework/providers/AppProvider',
+    '@adonisjs/framework/providers/ViewProvider',
+    '@adonisjs/lucid/providers/LucidProvider',
+    '@adonisjs/bodyparser/providers/BodyParserProvider',
+    '@adonisjs/cors/providers/CorsProvider',
+    '@adonisjs/shield/providers/ShieldProvider',
+    '@adonisjs/session/providers/SessionProvider',
+    '@adonisjs/auth/providers/AuthProvider',
+    '@adonisjs/validator/providers/ValidatorProvider',
+    'adonis-bumblebee/providers/BumblebeeProvider',
+    'adonis-acl/providers/AclProvider',
+    'adonis-swagger/providers/SwaggerProvider',
+    path.join(__dirname, '..', 'providers', 'Validators/ExistsValidator'),
+    'adonis-scheduler/providers/SchedulerProvider',
+    path.join(__dirname, '..', 'providers', 'RouteBinding/RouteModelBindingProvider'),
+    'adonis-jsonable/providers/JsonableProvider',
+    path.join(__dirname, '..', 'providers', 'Validators/DateFormatValidator'),
+    '@adonisjs/drive/providers/DriveProvider',
+    'adonis-lucid-polymorphic/providers/PolymorphicProvider',
+    '@radmen/adonis-lucid-soft-deletes/providers/SoftDeletesProvider',
+    path.join(__dirname, '..', 'providers', 'Validators/NotExistsValidator'),
+    '@adonisjs/cors/providers/CorsProvider',
+    '@adonisjs/redis/providers/RedisProvider',
+    'adonis-queue-pro/providers/QueueProvider'
 ]
 
 /*
@@ -47,11 +49,12 @@ const providers = [
 |
 */
 const aceProviders = [
-  '@adonisjs/lucid/providers/MigrationsProvider',
-  'adonis-bumblebee/providers/CommandsProvider',
-  'adonis-acl/providers/CommandsProvider',
-  '@adonisjs/vow/providers/VowProvider',
-  'adonis-scheduler/providers/CommandsProvider'
+    '@adonisjs/lucid/providers/MigrationsProvider',
+    'adonis-bumblebee/providers/CommandsProvider',
+    'adonis-acl/providers/CommandsProvider',
+    '@adonisjs/vow/providers/VowProvider',
+    'adonis-scheduler/providers/CommandsProvider',
+    'adonis-queue-pro/providers/CommandProvider'
 ]
 
 /*
@@ -67,9 +70,10 @@ const aceProviders = [
 |
 */
 const aliases = {
-  Role: 'Adonis/Acl/Role',
-  Permission: 'Adonis/Acl/Permission',
-  Scheduler: 'Adonis/Addons/Scheduler',
+    Role: 'Adonis/Acl/Role',
+    Permission: 'Adonis/Acl/Permission',
+    Scheduler: 'Adonis/Addons/Scheduler',
+    Queue: 'Adonis/Addons/Queue'
 }
 
 /*
@@ -80,6 +84,10 @@ const aliases = {
 | Here you store ace commands for your package
 |
 */
-const commands = []
+const commands = [
+    'Adonis/Commands/Queue:Init',
+    'Adonis/Commands/Queue:Job',
+    'Adonis/Commands/Queue:Work'
+]
 
-module.exports = { providers, aceProviders, aliases, commands }
+module.exports = {providers, aceProviders, aliases, commands}
