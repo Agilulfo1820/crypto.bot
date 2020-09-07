@@ -5,6 +5,9 @@ const Account = use("App/Models/Account")
 const Encryption = use('Encryption')
 var TDSequential = require("tdsequential")
 const Env = use('Env')
+const Strategy = use('App/Models/Strategy')
+const StrategyLog = use('App/Models/StrategyLog')
+const TradeLog = use('App/Models/TradeLog')
 
 /**
  * Sample job consumer class
@@ -20,7 +23,7 @@ class TDSequentialJob {
      * @return {Int} Num of jobs processed at time
      */
     static get concurrency() {
-        return 25;
+        return 250;
     }
 
     /**
@@ -57,19 +60,30 @@ class TDSequentialJob {
     /**
      * Handle the sending of email data
      * You can drop the async keyword if it is synchronous
+     *
+     * Take asset from strategy
+     * Connect to user's Binance account
+     * Analyze data
+     * Buy or Sell asset
      */
     async handle() {
-        /**
-         * TODO
-         * 3. Connect to user's Binance account
-         * 4. Take asset from strategy
-         * 5. Buy or Sell asset
-         */
-
         console.group('TdSequential strategy started')
-        // Get first portfolio.
-        // We do this only now for test purposes, this is a big security risk
-        const account = await Account.firstOrFail()
+        const strategy = await Strategy.findOrFail(this.data.strategy.id)
+
+        //Retrieve asset
+        const asset = await strategy.asset().fetch()
+        const firstCoin = await asset.firstCoin()
+        const secondCoin = await asset.secondCoin()
+        const assetName = firstCoin.symbol + '' + secondCoin.symbol
+        console.log('Asset: ', assetName)
+
+        // Get the account associated with the strategy
+        const account = await strategy.account().fetch()
+        console.log('Account: ', account.name, account.api_key)
+
+        // Retrieve the timeframe of the strategy
+        const timeframe = await strategy.timeframe().fetch()
+        console.log('Timeframe: ', timeframe.value)
 
         // Initialize binance api
         const binance = new Binance().options({
@@ -78,7 +92,14 @@ class TDSequentialJob {
         });
 
         // Get last 500 daily ticks from binance
-        let ticks = await binance.candlesticks("BTCUSDT", "1d", null, {limit: 200})
+        let ticks
+        try {
+            ticks = await binance.candlesticks(assetName, timeframe.value, null, {limit: 200})
+        } catch (e) {
+            console.error('ERROR: ', e)
+            return
+        }
+
 
         // map ticks in ohlc format
         ticks = ticks.map(function (tick, index) {
@@ -129,6 +150,17 @@ class TDSequentialJob {
             SELL = true
         }
 
+        // Log data and SELL result to db
+        let strategyLog = new StrategyLog()
+        strategyLog.strategy_id = strategy.id
+        strategyLog.data = {
+            lastWeekTicks: lastWeekTicks,
+            secondLastTD: secondLastTD,
+            action: SELL ? 'SELL' : 'BUY'
+        }
+        await strategyLog.save()
+        console.log('Logged strategy!')
+
         if (SELL === null) {
             console.info('FINAL ACTION: Match not found, no actions required.')
             console.groupEnd()
@@ -137,39 +169,52 @@ class TDSequentialJob {
 
         // Log everything but sell on binance only if env is set to "production"
         const env = Env.get('NODE_ENV', 'development')
-        // TODO:Log data and SELL result to db
+
+        //TODO: gestire quantity, parto con dollari e quantiti è 20,
+        // poi però compro btc e quantity è 0.001 btc poi rivendo...
+        // Quindi non cambia solo il valore di quantity ma cambia anche il valore di cosa rappresenta la quantity
+        let quantity = 1;
 
         if (SELL) {
             console.info('FINAL ACTION: SELL')
             if (env === 'production') {
-                //TODO: gestire quantity, parto con dollari e quantiti è 20,
-                // poi però compro btc e quantity è 0.001 btc poi rivendo...
-                // Quindi non cambia solo il valore di quantity ma cambia anche il valore di cosa rappresenta la quantity
-                let quantity = 1;
-
                 // These orders will be executed at current market price.
-                binance.marketSell("BTCUSDT", quantity, (error, response) => {
+                binance.marketSell(assetName, quantity, (error, response) => {
                     console.info("Market Buy response", response);
                     console.info("order id: " + response.orderId);
 
                     // TODO:Log the trade
                 })
             } else {
-                // TODO:Fake log sell
+                // Fake log sell
+                let tradeLog = new TradeLog()
+                tradeLog.strategy_id = strategy.id
+                tradeLog.trade_type = 'SELL'
+                tradeLog.quantity = quantity
+                tradeLog.price = 0
+                await tradeLog.save()
+                console.log('Logged Fake SELL!')
             }
         } else {
             console.info('FINAL ORDER: BUY')
             if (env === 'production') {
                 let quantity = 1;
                 // These orders will be executed at current market price.
-                binance.marketBuy("BTCUSDT", quantity, (error, response) => {
+                binance.marketBuy(assetName, quantity, (error, response) => {
                     console.info("Market Buy response", response);
                     console.info("order id: " + response.orderId);
 
                     // TODO:Log the trade
                 })
             } else {
-                // TODO:Fake log sell
+                // Fake log buy
+                let tradeLog = new TradeLog()
+                tradeLog.strategy_id = strategy.id
+                tradeLog.trade_type = 'BUY'
+                tradeLog.quantity = quantity
+                tradeLog.price = 0
+                await tradeLog.save()
+                console.log('Logged Fake BUY!')
             }
         }
 
