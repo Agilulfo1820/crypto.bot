@@ -1,7 +1,7 @@
 'use strict';
 
 const Binance = require('node-binance-api')
-const Portfolio = use("App/Models/Portfolio")
+const Account = use("App/Models/Account")
 const Encryption = use('Encryption')
 var TDSequential = require("tdsequential")
 const Env = use('Env')
@@ -69,12 +69,12 @@ class TDSequentialJob {
         console.group('TdSequential strategy started')
         // Get first portfolio.
         // We do this only now for test purposes, this is a big security risk
-        const portfolio = await Portfolio.firstOrFail()
+        const account = await Account.firstOrFail()
 
         // Initialize binance api
         const binance = new Binance().options({
-            APIKEY: portfolio.api_key,
-            APISECRET: Encryption.decrypt(portfolio.api_secret)
+            APIKEY: account.api_key,
+            APISECRET: Encryption.decrypt(account.api_secret)
         });
 
         // Get last 500 daily ticks from binance
