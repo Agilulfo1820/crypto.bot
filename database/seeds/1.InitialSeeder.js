@@ -116,6 +116,18 @@ class InitialSeeder {
         await roleAdmin.save()
 
         await user.roles().attach([roleAdmin.id])
+
+        /**
+         * Seeding Indicators
+         */
+        console.log('Seeding Indicators')
+        await Database.table('indicators')
+            .insert([
+                {
+                    name: 'Td Sequential',
+                    slug: 'tds'
+                }
+            ])
     }
 }
 
