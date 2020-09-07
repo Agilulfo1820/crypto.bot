@@ -62,7 +62,8 @@ class TDSequentialJob {
         /**
          * TODO
          * 3. Connect to user's Binance account
-         * 4. Buy or Sell asset
+         * 4. Take asset from strategy
+         * 5. Buy or Sell asset
          */
 
         console.group('TdSequential strategy started')
@@ -99,31 +100,31 @@ class TDSequentialJob {
 
         // Take the previous td since the last one is the current tick
         // so we need its timeframe to close in order to correctly elaborate the data
-        let lastTD = tdSequential.reverse()[1]
-        console.info('TD Sequential of last day: ', lastTD)
+        let secondLastTD = tdSequential.reverse()[1]
+        console.info('TD Sequential of second last day: ', secondLastTD)
 
         // We will check all condition and set the result (if to sell or not) in this boolean
         // If at the end of all check this variable will still be null then we don't do anything
         let SELL = null
 
-        if (lastTD.bullishFlip || lastTD.buySetupPerfection) {
+        if (secondLastTD.bullishFlip || secondLastTD.buySetupPerfection) {
             console.log('BUY: lastTD.bullishFlip || lastTD.buySetupPerfection')
             SELL = false
         }
 
-        if (lastTD.bearishFlip || lastTD.sellSetupPerfection) {
+        if (secondLastTD.bearishFlip || secondLastTD.sellSetupPerfection) {
             console.log('SELL: lastTD.bearishFlip || lastTD.sellSetupPerfection')
             SELL = true
         }
 
         // If it's a green two upon a green one
-        if (lastTD.sellSetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)) {
+        if (secondLastTD.buySetupIndex === 2 && (lastWeekTicks[1].close > lastWeekTicks[2].close)) {
             console.log('BUY: lastTD.sellSetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)')
             SELL = false
         }
 
         // If it's a red two under a red one
-        if (lastTD.buySetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)) {
+        if (secondLastTD.sellSetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)) {
             console.log('SELL: lastTD.buySetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)')
             SELL = true
         }
@@ -134,10 +135,44 @@ class TDSequentialJob {
             return false
         }
 
-        SELL ? console.info('FINAL ACTION: SELL') : console.info('FINAL ORDER: BUY')
-
-        const env = Env.get('NODE_ENV', 'development')
         // Log everything but sell on binance only if env is set to "production"
+        const env = Env.get('NODE_ENV', 'development')
+        // TODO:Log data and SELL result to db
+
+        if (SELL) {
+            console.info('FINAL ACTION: SELL')
+            if (env === 'production') {
+                //TODO: gestire quantity, parto con dollari e quantiti è 20,
+                // poi però compro btc e quantity è 0.001 btc poi rivendo...
+                // Quindi non cambia solo il valore di quantity ma cambia anche il valore di cosa rappresenta la quantity
+                let quantity = 1;
+
+                // These orders will be executed at current market price.
+                binance.marketSell("BTCUSDT", quantity, (error, response) => {
+                    console.info("Market Buy response", response);
+                    console.info("order id: " + response.orderId);
+
+                    // TODO:Log the trade
+                })
+            } else {
+                // TODO:Fake log sell
+            }
+        } else {
+            console.info('FINAL ORDER: BUY')
+            if (env === 'production') {
+                let quantity = 1;
+                // These orders will be executed at current market price.
+                binance.marketBuy("BTCUSDT", quantity, (error, response) => {
+                    console.info("Market Buy response", response);
+                    console.info("order id: " + response.orderId);
+
+                    // TODO:Log the trade
+                })
+            } else {
+                // TODO:Fake log sell
+            }
+        }
+
 
         console.groupEnd()
     }
