@@ -5,6 +5,7 @@ const Binance = require('node-binance-api')
 const Portfolio = use("App/Models/Portfolio")
 const Encryption = use('Encryption')
 var TDSequential = require("tdsequential")
+const Env = use('Env')
 
 class TdSequentialStrategy extends Task {
     static get schedule() {
@@ -13,7 +14,14 @@ class TdSequentialStrategy extends Task {
     }
 
     async handle() {
-        console.group('TdSequentialStrategy check')
+        /**
+         * TODO
+         * 1. Get strategies with this indicator
+         * 2. Subdivide in jobs for each strategy
+         * 3. Connect to user's Binance account
+         * 4. Buy or Sell asset
+         */
+        console.group('TdSequential strategy started')
         // Get first portfolio.
         // We do this only now for test purposes, this is a big security risk
         const portfolio = await Portfolio.firstOrFail()
@@ -64,7 +72,7 @@ class TdSequentialStrategy extends Task {
             SELL = true
         }
 
-        // If it's a green two apon a green one
+        // If it's a green two upon a green one
         if (lastTD.sellSetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)) {
             console.log('BUY: lastTD.sellSetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)')
             SELL = false
@@ -77,11 +85,14 @@ class TdSequentialStrategy extends Task {
         }
 
         if (SELL === null) {
-            console.info('FINAL ORDER: Match not found, no actions required.' )
+            console.info('FINAL ACTION: Match not found, no actions required.' )
             return false
         }
 
-        SELL ? console.info('FINAL ORDER: SELL') : console.info('FINAL ORDER: BUY')
+        SELL ? console.info('FINAL ACTION: SELL') : console.info('FINAL ORDER: BUY')
+
+        const env = Env.get('NODE_ENV', 'development')
+        // Log everything but sell on binance only if env is set to "production"
 
         console.groupEnd()
     }
