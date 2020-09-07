@@ -8,6 +8,11 @@ const Env = use('Env')
 const Strategy = use('App/Models/Strategy')
 const StrategyLog = use('App/Models/StrategyLog')
 const TradeLog = use('App/Models/TradeLog')
+const betterLogging = require('better-logging')
+const {MessageConstructionStrategy} = betterLogging
+betterLogging(console, {
+    messageConstructionStrategy: MessageConstructionStrategy.NONE,
+});
 
 /**
  * Sample job consumer class
@@ -75,16 +80,16 @@ class TDSequentialJob {
         const firstCoin = await asset.firstCoin()
         const secondCoin = await asset.secondCoin()
         const assetName = firstCoin.symbol + '' + secondCoin.symbol
-        console.log('Asset: ', assetName)
+        console.info('Asset: ', assetName)
 
         // Get the account associated with the strategy
         const account = await strategy.account().fetch()
-        console.log('Account: ', account.name, account.api_key)
+        console.info('Account: ', account.name, account.api_key)
 
         // Retrieve the timeframe of the strategy
         let timeframe = await strategy.timeframe().fetch()
         timeframe = timeframe.value + '' + timeframe.range
-        console.log('Timeframe: ', timeframe)
+        console.info('Timeframe: ', timeframe)
 
         // Initialize binance api
         const binance = new Binance().options({
@@ -130,30 +135,30 @@ class TDSequentialJob {
         let SELL = null
 
         if (secondLastTD.bullishFlip || secondLastTD.buySetupPerfection) {
-            console.log('BUY: lastTD.bullishFlip || lastTD.buySetupPerfection')
+            console.info('BUY: lastTD.bullishFlip || lastTD.buySetupPerfection')
             SELL = false
         }
 
         if (secondLastTD.bearishFlip || secondLastTD.sellSetupPerfection) {
-            console.log('SELL: lastTD.bearishFlip || lastTD.sellSetupPerfection')
+            console.info('SELL: lastTD.bearishFlip || lastTD.sellSetupPerfection')
             SELL = true
         }
 
         // If it's a green two upon a green one
         if (secondLastTD.buySetupIndex === 2 && (lastWeekTicks[1].close > lastWeekTicks[2].close)) {
-            console.log('BUY: lastTD.sellSetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)')
+            console.info('BUY: lastTD.sellSetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)')
             SELL = false
         }
 
         // If it's a red two under a red one
         if (secondLastTD.sellSetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)) {
-            console.log('SELL: lastTD.buySetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)')
+            console.info('SELL: lastTD.buySetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)')
             SELL = true
         }
 
         // If it's a green 9  then sell (or better: if yesterday was a green 8 then sell today)
         if (secondLastTD.sellCoundownIndex === 8) {
-            console.log('SELL: secondLastTD.sellCoundownIndex')
+            console.info('SELL: secondLastTD.sellCoundownIndex')
             SELL = true
         }
 
@@ -166,7 +171,7 @@ class TDSequentialJob {
             action: SELL ? 'SELL' : 'BUY'
         }
         await strategyLog.save()
-        console.log('Logged strategy!')
+        console.debug('Logged strategy!')
 
         if (SELL === null) {
             console.info('FINAL ACTION: Match not found, no actions required.')

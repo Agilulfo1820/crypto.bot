@@ -39,6 +39,7 @@
     "adonis-queue-pro": "^2.0.0",
     "adonis-scheduler": "^3.0.2",
     "adonis-swagger": "^1.2.9",
+    "better-logging": "^4.4.0",
     "mariadb": "^2.4.2",
     "md5-file": "^5.0.0",
     "mysql": "^2.18.1",

@@ -7,6 +7,11 @@ const Strategy = use('App/Models/Strategy')
 const Indicator = use('App/Models/Indicator')
 const Config = use('Config')
 const constants = Config.get('constants')
+const betterLogging = require('better-logging')
+const {MessageConstructionStrategy} = betterLogging
+betterLogging(console, {
+    messageConstructionStrategy: MessageConstructionStrategy.NONE,
+});
 
 class TdSequentialStrategy extends Task {
     static get schedule() {
@@ -42,7 +47,7 @@ class TdSequentialStrategy extends Task {
             if (!lastStrategyLog || (lastStrategyLog && lastStrategyLog.created_at <= timeFrameDate)) {
                 Queue.dispatch(new Job({strategy: strategy}), 'now');
             } else {
-                console.log('Strategy ' + strategy.name + ' was already executed!')
+                console.warn('Strategy ' + strategy.name + ' was already executed!')
             }
         }
     }
