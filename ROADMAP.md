@@ -20,3 +20,8 @@
 
 ## PRODUCTION
 
+## V2
+
+- Aggiungere più indicatori
+- Aggiunta di strategie con più indicatori (Esempio TD + Media, con il loro specifico algoritmo)
+
