@@ -8,7 +8,7 @@ class IndicatorsSchema extends Schema {
     this.create('indicators', (table) => {
       table.increments()
       table.string('slug').unique()
-      table.string('symbol')
+      table.string('name')
       table.string('description')
     })
   }

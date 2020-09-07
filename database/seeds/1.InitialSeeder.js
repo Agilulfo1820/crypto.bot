@@ -124,8 +124,51 @@ class InitialSeeder {
         await Database.table('indicators')
             .insert([
                 {
+                    slug: 'tds',
                     name: 'Td Sequential',
-                    slug: 'tds'
+                }
+            ])
+
+        /**
+         * Seeding Timeframes
+         */
+        console.log('Seeding Timeframes')
+        await Database.table('timeframes')
+            .insert([
+                {
+                    value: '1h',
+                    slug: '1h',
+                    description: '1 hour'
+                },
+                {
+                    value: '2h',
+                    slug: '2h',
+                    description: '2 hours'
+                },
+                {
+                    value: '3h',
+                    slug: '3h',
+                    description: '3 hours'
+                },
+                {
+                    value: '4h',
+                    slug: '4h',
+                    description: '4 hours'
+                },
+                {
+                    value: '8h',
+                    slug: '8h',
+                    description: '8 hours'
+                },
+                {
+                    value: '12h',
+                    slug: '12h',
+                    description: '12 hours'
+                },
+                {
+                    value: '1d',
+                    slug: '1d',
+                    description: '1 day'
                 }
             ])
     }
