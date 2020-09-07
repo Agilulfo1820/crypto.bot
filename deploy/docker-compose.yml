@@ -39,9 +39,24 @@ services:
       - "8080:8080" # matches actual listener message
     depends_on:
       - db-crypto
+      - redis
     networks:
       - api-network
     image: crypto.api:latest
+
+  redis:
+    image: crypto.redis:latest
+    container_name: "${SERVICE_PREFIX}-redis"
+    command: [ "redis-server", "--bind", "redis", "--port", "6379" ]
+    build:
+      context: ../
+      dockerfile: deploy/redis/Dockerfile
+    restart: always
+    ports:
+      - "127.0.0.1:6379:6379"
+    networks:
+      - api-network
+
 
 networks:
   api-network:
