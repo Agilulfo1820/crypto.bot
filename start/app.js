@@ -35,7 +35,8 @@ const providers = [
     '@radmen/adonis-lucid-soft-deletes/providers/SoftDeletesProvider',
     path.join(__dirname, '..', 'providers', 'Validators/NotExistsValidator'),
     '@adonisjs/cors/providers/CorsProvider',
-    '@adonisjs/redis/providers/RedisProvider'
+    '@adonisjs/redis/providers/RedisProvider',
+    'adonis-queue-pro/providers/QueueProvider'
 ]
 
 /*
@@ -53,6 +54,7 @@ const aceProviders = [
     'adonis-acl/providers/CommandsProvider',
     '@adonisjs/vow/providers/VowProvider',
     'adonis-scheduler/providers/CommandsProvider',
+    'adonis-queue-pro/providers/CommandProvider'
 ]
 
 /*
@@ -71,6 +73,7 @@ const aliases = {
     Role: 'Adonis/Acl/Role',
     Permission: 'Adonis/Acl/Permission',
     Scheduler: 'Adonis/Addons/Scheduler',
+    Queue: 'Adonis/Addons/Queue'
 }
 
 /*
@@ -82,19 +85,9 @@ const aliases = {
 |
 */
 const commands = [
-
+    'Adonis/Commands/Queue:Init',
+    'Adonis/Commands/Queue:Job',
+    'Adonis/Commands/Queue:Work'
 ]
 
-/*
-|--------------------------------------------------------------------------
-| Jobs
-|--------------------------------------------------------------------------
-|
-| Here you store your jobs
-|
-*/
-const jobs = [
-
-]
-
-module.exports = {providers, aceProviders, aliases, commands, jobs}
+module.exports = {providers, aceProviders, aliases, commands}

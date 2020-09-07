@@ -10,13 +10,14 @@
 |
 */
 
-// const Redis = use('Redis')
+const Redis = use('Redis')
 
 /**
  * Inline subscriber
  */
 // Redis.subscribe('news', async () => {
 // })
+Redis.on('error', console.log)
 
 /**
  * Binding method from a module saved inside `app/Listeners/News`
