@@ -19,6 +19,7 @@ const Database = use('Database')
 const uuid = require("uuid/v4")
 const Hash = use('Hash')
 const Encryption = use('Encryption')
+const Role = use("Adonis/Acl/Role")
 
 class InitialSeeder {
     async run() {
@@ -103,6 +104,18 @@ class InitialSeeder {
                     second_coin_id: BTC.id
                 }
             ])
+
+        /**
+         * Seeding Roles
+         */
+        console.log('Seeding Roles')
+        const roleAdmin = new Role()
+        roleAdmin.name = 'Administrator'
+        roleAdmin.slug = 'administrator'
+        roleAdmin.description = 'manage administration privileges'
+        await roleAdmin.save()
+
+        await user.roles().attach([roleAdmin.id])
     }
 }
 
