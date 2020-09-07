@@ -35,7 +35,6 @@ const providers = [
     '@radmen/adonis-lucid-soft-deletes/providers/SoftDeletesProvider',
     path.join(__dirname, '..', 'providers', 'Validators/NotExistsValidator'),
     '@adonisjs/cors/providers/CorsProvider',
-    'adonis-kue/providers/KueProvider',
     '@adonisjs/redis/providers/RedisProvider'
 ]
 
@@ -54,7 +53,6 @@ const aceProviders = [
     'adonis-acl/providers/CommandsProvider',
     '@adonisjs/vow/providers/VowProvider',
     'adonis-scheduler/providers/CommandsProvider',
-    'adonis-kue-provider/providers/CommandsProvider',
 ]
 
 /*
@@ -73,7 +71,6 @@ const aliases = {
     Role: 'Adonis/Acl/Role',
     Permission: 'Adonis/Acl/Permission',
     Scheduler: 'Adonis/Addons/Scheduler',
-    Kue: 'Adonis/Addons/Kue'
 }
 
 /*
@@ -85,7 +82,7 @@ const aliases = {
 |
 */
 const commands = [
-    'Adonis/Commands/Kue:Listen'
+
 ]
 
 /*
@@ -97,7 +94,7 @@ const commands = [
 |
 */
 const jobs = [
-    'App/Jobs/TDSequantialStrategyJob'
+
 ]
 
 module.exports = {providers, aceProviders, aliases, commands, jobs}
