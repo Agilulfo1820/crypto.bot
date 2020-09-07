@@ -30,7 +30,6 @@ Inside windows docker settings, select **Expose daemon on tcp://localhost:2375 w
 3. Create a .env file
 4. Run `./develop.sh up` to build the images and start the containers 
 (you can use the `-d` flag to run containers in the background)
-5. Run `./develop.sh bash` to enter the api container. Now you can execute adonis commands.
 6. Run `./develop.sh adonis key:generate` in the bash to generate an App Key
 7. Run `./develop.sh mfs` to run the migrations
 
