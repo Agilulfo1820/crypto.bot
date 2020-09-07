@@ -20,7 +20,7 @@ class TDSequentialJob {
      * @return {Int} Num of jobs processed at time
      */
     static get concurrency() {
-        return 1;
+        return 25;
     }
 
     /**

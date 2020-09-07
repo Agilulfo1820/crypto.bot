@@ -3,7 +3,7 @@
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model')
 
-class Coin extends Model {
+class Timeframe extends Model {
     static get createdAtColumn () {
         return null;
     }
@@ -11,6 +11,10 @@ class Coin extends Model {
     static get updatedAtColumn () {
         return null;
     }
+
+    strategies() {
+        return this.hasMany('App/Models/Strategy', 'id', 'timeframe_id')
+    }
 }
 
-module.exports = Coin
+module.exports = Timeframe
