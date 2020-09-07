@@ -4,7 +4,7 @@
 const Model = use('Model')
 const Encryption = use('Encryption')
 
-class Portfolio extends Model {
+class Account extends Model {
     static boot () {
         super.boot()
 
@@ -12,16 +12,22 @@ class Portfolio extends Model {
          * A hook to encrypt the api_secret before saving
          * it to the database.
          */
-        this.addHook('beforeSave', async (portfolioInstance) => {
-            if (portfolioInstance.dirty.api_secret) {
-                portfolioInstance.api_secret = Encryption.encrypt(portfolioInstance.api_secret)
+        this.addHook('beforeSave', async (accountInstance) => {
+            if (accountInstance.dirty.api_secret) {
+                accountInstance.api_secret = Encryption.encrypt(accountInstance.api_secret)
             }
         })
+
+        this.addTrait('@provider:Lucid/SoftDeletes')
     }
 
     user() {
         return this.belongsTo('App/Models/User', 'user_id', 'id')
     }
+
+    exchange() {
+        return this.belongsTo('App/Models/Exchange', 'exchange_id', 'id')
+    }
 }
 
-module.exports = Portfolio
+module.exports = Account

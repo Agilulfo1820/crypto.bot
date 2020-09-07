@@ -14,6 +14,7 @@
 const Factory = use('Factory')
 const User = use('App/Models/User')
 const Coin = use('App/Models/Coin')
+const Exchange = use('App/Models/Exchange')
 const Database = use('Database')
 const uuid = require("uuid/v4")
 const Hash = use('Hash')
@@ -27,19 +28,34 @@ class InitialSeeder {
         console.log('Seeding Users')
         await Database.table('users')
             .insert({
-                username: 'testUser'
+                username: 'testUser',
+                password: 'Hello123!',
+                email: 'test@email.com',
+                phone_number: '3207925997',
             })
         const user = await User.first()
 
         /**
-         * Seeding Portfolios
+         * Seeding Exchanges
          */
-        console.log('Seeding Portfolios')
-        await Database.table('portfolios')
+        console.log('Seeding Exchanges')
+        await Database.table('exchanges')
+            .insert({
+                name: 'Binance',
+                slug: 'binance'
+            })
+        const exchange = await Exchange.first()
+
+        /**
+         * Seeding Accounts
+         */
+        console.log('Seeding Accounts')
+        await Database.table('accounts')
             .insert({
                 user_id: user.id,
-                slug: 'testPortfolio',
-                description: 'Test portfolio with only read permissions',
+                exchange_id: exchange.id,
+                name: 'testAccount',
+                balance: 0,
                 api_key: '2uQAZvjbwwrwqG3Qqbx3XCB43LxRaQw85lPSuoyXGilVfAdfnh2F0mTRjrb7UP4s',
                 api_secret:  Encryption.encrypt('sqejRQMHIbbN316cJElzVo758yWyi2KPu8cWVvT0tTKGA2wv511ibd3v6WbVDk6W')
             })
