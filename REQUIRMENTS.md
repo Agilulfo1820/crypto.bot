@@ -55,3 +55,11 @@ Se sono admin voglio poter **aggiungere altri utenti** e **selezionare se sono a
 ## Storia 9
 
 Voglio poter vedere tutti gli indicatori disponibili. **(SOLO ADMIN)**
+
+## Storia 10
+
+Ogni *minuto* deve girare un cronjob per ogni specifico indicatore. Questo job deve prednere tutte le strategia che lo usano. Deve guardare il timeframe di ogni strategia e verificare che non ha già runnato questa strategia in un range di tempo che equivale il timeframe impostato.
+
+ES: Imposto una strategia con indicatore *td* a *1d*. Parte il cronjob e controlla che nell'ultimo giorno questa strategia non è stata azionata. Questa strategia non è stata azionata quindi l'aziona e segue algoritmo della strategia. Il minuto dopo parte dinnuovo il cron e verifica questa volta che la strategia è già stata azionata nell'ultimo giorno quindi non l'aziona. Cosi fino al giorno dopo.
+
+Il cronjob deve creare un job per ogni strategia che trova per quell'indicatore e gestirle tutte contemporaneamente.
