@@ -89,10 +89,6 @@ class InitialSeeder {
             .insert([
                 {
                     first_coin_id: BTC.id,
-                    second_coin_id: ETH.id
-                },
-                {
-                    first_coin_id: BTC.id,
                     second_coin_id: USDT.id
                 },
                 {
@@ -169,6 +165,24 @@ class InitialSeeder {
                     value: '1d',
                     slug: '1d',
                     description: '1 day'
+                }
+            ])
+
+        /**
+         * Seeding Strategy
+         */
+        console.log('Seeding Test Strategy')
+        await Database.table('strategies')
+            .insert([
+                {
+                    name: 'Td Test Strategy 1D',
+                    coin_pair_id: 2,
+                    indicator_id: 1,
+                    account_id: 1,
+                    timeframe_id: 7,
+                    budget: 0,
+                    balance: 0,
+                    is_active: 1
                 }
             ])
     }
