@@ -13,6 +13,7 @@ class TdSequentialStrategy extends Task {
     }
 
     async handle() {
+        console.group('TdSequentialStrategy new scan')
         // Get first portfolio.
         // We do this only now for test purposes, this is a big security risk
         const portfolio = await Portfolio.firstOrFail()
@@ -38,6 +39,9 @@ class TdSequentialStrategy extends Task {
             }
         });
 
+        let lastWeekTicks = ticks.reverse().slice(0, 7)
+        console.info(lastWeekTicks)
+
         // Use TD Sequantial indicator on ticks
         let tdSequential = TDSequential(ticks)
 
@@ -46,38 +50,40 @@ class TdSequentialStrategy extends Task {
         let lastTD = tdSequential.reverse()[1]
         console.info(lastTD)
 
-        if (lastTD.bullishFlip) {
-            console.info('BUY')
+        // We will check all condition and set the result (if to sell or not) in this boolean
+        // If at the end of all check this variable will still be null then we don't do anything
+        let SELL = null
+
+        if (lastTD.bullishFlip || lastTD.buySetupPerfection) {
+            console.log('BUY: lastTD.bullishFlip || lastTD.buySetupPerfection')
+            SELL = false
         }
 
-        if (lastTD.bearishFlip) {
-            console.info('SELL')
+        if (lastTD.bearishFlip || lastTD.sellSetupPerfection) {
+            console.log('SELL: lastTD.bearishFlip || lastTD.sellSetupPerfection')
+            SELL = true
         }
-        /**
-         * TODO: Logica da introdurre
-         *
-         * if (bearishFlip) {
-         *     vendi se ho qualcosa da vendere
-         * }
-         *
-         * if (bullishFlip) {
-         *     compra, se ho soldi per comprare
-         * }
-         *
-         * if (sellSetupIndex == 8) {
-         *     vendi 50% di quello che ho
-         * }
-         *
-         * if (sellSetupIndex == 9) {
-         *     vendi tutto
-         * }
-         *
-         * Altre logiche:
-         * il 2 verde sopra 1 verde (guardando i TDSTBUY) e il 3 verde sopra 1 verde e 2 verde
-         * il 2 rosso sotto 1 rosso
-         *
-         * Gestire le percentuali di soldi, i soldi investiti, quelli non investiti, etc.
-         */
+
+        // If it's a green two apon a green one
+        if (lastTD.sellSetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)) {
+            console.log('BUY: lastTD.sellSetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)')
+            SELL = false
+        }
+
+        // If it's a red two under a red one
+        if (lastTD.buySetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)) {
+            console.log('SELL: lastTD.buySetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)')
+            SELL = true
+        }
+
+        if (SELL === null) {
+            console.info('FINAL ORDER: Match not found, no actions required.' )
+            return false
+        }
+
+        SELL ? console.info('FINAL ORDER: SELL') : console.info('FINAL ORDER: BUY')
+
+        console.groupEnd()
     }
 }
 
