@@ -13,7 +13,7 @@ class TdSequentialStrategy extends Task {
     }
 
     async handle() {
-        console.group('TdSequentialStrategy new scan')
+        console.group('TdSequentialStrategy check')
         // Get first portfolio.
         // We do this only now for test purposes, this is a big security risk
         const portfolio = await Portfolio.firstOrFail()
@@ -40,7 +40,7 @@ class TdSequentialStrategy extends Task {
         });
 
         let lastWeekTicks = ticks.reverse().slice(0, 7)
-        console.info(lastWeekTicks)
+        console.info('Last Week Ticks: ', lastWeekTicks)
 
         // Use TD Sequantial indicator on ticks
         let tdSequential = TDSequential(ticks)
@@ -48,7 +48,7 @@ class TdSequentialStrategy extends Task {
         // Take the previous td since the last one is the current tick
         // so we need its timeframe to close in order to correctly elaborate the data
         let lastTD = tdSequential.reverse()[1]
-        console.info(lastTD)
+        console.info('TD Sequential of last day: ', lastTD)
 
         // We will check all condition and set the result (if to sell or not) in this boolean
         // If at the end of all check this variable will still be null then we don't do anything
