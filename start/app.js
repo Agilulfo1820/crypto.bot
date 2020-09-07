@@ -34,7 +34,8 @@ const providers = [
   'adonis-lucid-polymorphic/providers/PolymorphicProvider',
   '@radmen/adonis-lucid-soft-deletes/providers/SoftDeletesProvider',
   path.join(__dirname, '..', 'providers', 'Validators/NotExistsValidator'),
-  '@adonisjs/cors/providers/CorsProvider'
+  '@adonisjs/cors/providers/CorsProvider',
+  'adonis-kue/providers/KueProvider'
 ]
 
 /*
@@ -51,7 +52,8 @@ const aceProviders = [
   'adonis-bumblebee/providers/CommandsProvider',
   'adonis-acl/providers/CommandsProvider',
   '@adonisjs/vow/providers/VowProvider',
-  'adonis-scheduler/providers/CommandsProvider'
+  'adonis-scheduler/providers/CommandsProvider',
+  'adonis-kue/providers/CommandsProvider'
 ]
 
 /*
@@ -69,7 +71,7 @@ const aceProviders = [
 const aliases = {
   Role: 'Adonis/Acl/Role',
   Permission: 'Adonis/Acl/Permission',
-  Scheduler: 'Adonis/Addons/Scheduler',
+  Scheduler: 'Adonis/Addons/Scheduler'
 }
 
 /*
@@ -82,4 +84,16 @@ const aliases = {
 */
 const commands = []
 
-module.exports = { providers, aceProviders, aliases, commands }
+/*
+|--------------------------------------------------------------------------
+| Jobs
+|--------------------------------------------------------------------------
+|
+| Here you store your jobs
+|
+*/
+const jobs = [
+      'App/Jobs/Example'
+]
+
+module.exports = { providers, aceProviders, aliases, commands, jobs }
