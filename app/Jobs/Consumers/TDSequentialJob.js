@@ -210,10 +210,10 @@ class TDSequentialJob {
             } else {
                 // Fake log sell
                 await this.logTrade(strategy, 'SELL', quantity, 0)
-                messageData += '\n FAKE SELLED AT $$$'
+                messageData += '\n FAKE SOLD AT $$$'
             }
         } else {
-            messageData += '\n FINAL ACTION: SELL'
+            messageData += '\n FINAL ACTION: BUY'
             console.info('FINAL ORDER: BUY')
             if (env === 'production') {
                 let quantity = 1;
@@ -227,7 +227,7 @@ class TDSequentialJob {
             } else {
                 // Fake log buy
                 await this.logTrade(strategy, 'BUY', quantity, 0)
-                messageData += '\n FAKE BUYED AT $$$'
+                messageData += '\n FAKE BOUGHT AT $$$'
             }
         }
 
@@ -259,9 +259,8 @@ class TDSequentialJob {
     }
 
     sendTelegramMessage = async (message) => {
-        console.log(CHAT_IDS)
         for(const chatId of CHAT_IDS) {
-            console.log(chatId)
+            // console.log(chatId)
             await client.sendMessage(chatId, message, {
                 disableWebPagePreview: true,
                 disableNotification: true,
