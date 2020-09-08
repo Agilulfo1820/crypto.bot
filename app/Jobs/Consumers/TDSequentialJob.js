@@ -17,7 +17,7 @@ const {TelegramClient} = require('messaging-api-telegram')
 const client = new TelegramClient({
     accessToken: Env.get('TELEGRAM_TOKEN'),
 })
-const CHAT_ID = Env.get('TELEGRAM_CHAT_ID')
+const CHAT_IDS = Env.get('TELEGRAM_CHAT_IDS').split(",")
 
 /**
  * Sample job consumer class
@@ -259,10 +259,14 @@ class TDSequentialJob {
     }
 
     sendTelegramMessage = async (message) => {
-        await client.sendMessage(CHAT_ID, message, {
-            disableWebPagePreview: true,
-            disableNotification: true,
-        });
+        console.log(CHAT_IDS)
+        for(const chatId of CHAT_IDS) {
+            console.log(chatId)
+            await client.sendMessage(chatId, message, {
+                disableWebPagePreview: true,
+                disableNotification: true,
+            });
+        }
     }
 
 }
