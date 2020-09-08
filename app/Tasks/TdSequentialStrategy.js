@@ -47,7 +47,7 @@ class TdSequentialStrategy extends Task {
             if (!lastStrategyLog || (lastStrategyLog && lastStrategyLog.created_at <= timeFrameDate)) {
                 Queue.dispatch(new Job({strategy: strategy}), 'now');
             } else {
-                console.warn('Strategy ' + strategy.name + ' was already executed!')
+                console.warn('Skipping strategy  "' + strategy.name + '" since it was already executed!')
             }
         }
     }

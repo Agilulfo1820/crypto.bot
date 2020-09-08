@@ -42,6 +42,7 @@
     "better-logging": "^4.4.0",
     "mariadb": "^2.4.2",
     "md5-file": "^5.0.0",
+    "messaging-api-telegram": "^1.0.0",
     "mysql": "^2.18.1",
     "node-binance-api": "^0.11.12",
     "tdsequential": "^1.0.15"
