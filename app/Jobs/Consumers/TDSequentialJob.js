@@ -135,6 +135,7 @@ class TDSequentialJob {
 
         //Prepare the message to send on telegram with the strategy log
         let messageData = 'Strategy: ' + strategy.name + '\n'
+            + 'Indicator: TD Sequential Basic' + '\n'
             + 'Asset: ' + assetName + '\n'
             + 'Account: ' + account.name + '\n'
             + 'Timeframe: ' + timeframe + '\n'
