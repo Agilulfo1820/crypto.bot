@@ -18,10 +18,10 @@ services:
       MYSQL_USER: "homestead"
       MYSQL_PASSWORD: "password"
     networks:
-      - api-network
+      - crypto-api-network
     restart: always
     image: crypto.db:latest
-  api:
+  api-crypto:
     container_name: "${SERVICE_PREFIX}-api"
     tty: true
     build:
@@ -39,15 +39,15 @@ services:
       - "8080:8080" # matches actual listener message
     depends_on:
       - db-crypto
-      - redis
+      - redis-crypto
     networks:
-      - api-network
+      - crypto-api-network
     image: crypto.api:latest
 
-  redis:
+  redis-crypto:
     image: crypto.redis:latest
     container_name: "${SERVICE_PREFIX}-redis"
-    command: [ "redis-server", "--bind", "redis", "--port", "6379" ]
+    command: [ "redis-server", "--bind", "redis-crypto", "--port", "6379" ]
     build:
       context: ../
       dockerfile: deploy/redis/Dockerfile
@@ -55,11 +55,11 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - api-network
+      - crypto-api-network
 
 
 networks:
-  api-network:
+  crypto-api-network:
     driver: "bridge"
 
 volumes:

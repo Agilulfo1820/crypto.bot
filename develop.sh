@@ -29,21 +29,21 @@ if [ $# -gt 0 ];then
         $COMPOSE run --rm \
             -w /srv/app \
             --entrypoint "adonis migration:refresh --seed" \
-            api \
+            api-crypto \
             "$@"
     elif [ "$1" == "test" ]; then
         shift 1
         $COMPOSE run --rm \
             -w /srv/app \
             --entrypoint "adonis test" \
-            api \
+            api-crypto \
             "$@"
     elif [ "$1" == "adonis" ]; then
         shift 1
         $COMPOSE run --rm \
             -w /srv/app \
             --entrypoint "adonis" \
-            api \
+            api-crypto \
             "$@"
     else
         $COMPOSE "$@"
