@@ -12,6 +12,26 @@ This project uses Docker so, in order to run it, you will only need:
 - Docker
 - Docker-compose
 
+### Install Docker on Ubuntu
+
+```
+# Add some dependencies for docker and the AWS CLI
+- sudo apt-get update -y  # Get the most up-to-date repos.
+- sudo apt-get install -y apt-transport-https ca-certificates software-properties-common python-software-properties curl python3-pip
+# Install Docker
+- sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+- sudo apt-key fingerprint 0EBFCD88
+- sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+- sudo apt-get update -y
+- sudo apt-get install -y docker-ce
+# Fix Docker 'sudo' option
+- sudo chmod 666 /var/run/docker.sock
+# Install Docker Compose
+- sudo curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+- sudo chmod +x /usr/local/bin/docker-compose
+- docker-compose --version
+```
+
 #### Docker Windows troubleshooting
 Install [docker for windows](https://docs.docker.com/docker-for-windows/install/)
 
@@ -23,7 +43,7 @@ Run powershell as administrator and enter this into the console (will need to re
 
 Inside windows docker settings, select **Expose daemon on tcp://localhost:2375 without TLS**
 
-## Setup
+## Project setup
 
 1. Git clone this project
 2. Enter the project directory
