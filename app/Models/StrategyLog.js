@@ -14,6 +14,10 @@ class StrategyLog extends Model {
             'data'
         ]
     }
+
+    strategy() {
+        return this.belongsTo('App/Models/Strategy', 'strategy_id', 'id')
+    }
 }
 
 module.exports = StrategyLog

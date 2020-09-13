@@ -32,7 +32,7 @@ module.exports = {
     |
     */
     local: {
-        host: '172.17.0.1',
+        host: Env.get('REDIS_HOST', 'local'),
         port: 6379,
         password: null,
         db: 0,

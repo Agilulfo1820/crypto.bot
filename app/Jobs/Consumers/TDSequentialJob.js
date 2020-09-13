@@ -3,8 +3,21 @@
 const Binance = require('node-binance-api')
 const Account = use("App/Models/Account")
 const Encryption = use('Encryption')
-var TDSequential = require("tdsequential")
+const TDSequential = require("tdsequential")
 const Env = use('Env')
+const Strategy = use('App/Models/Strategy')
+const StrategyLog = use('App/Models/StrategyLog')
+const TradeLog = use('App/Models/TradeLog')
+const betterLogging = require('better-logging')
+const {MessageConstructionStrategy} = betterLogging
+betterLogging(console, {
+    messageConstructionStrategy: MessageConstructionStrategy.NONE,
+})
+const {TelegramClient} = require('messaging-api-telegram')
+const client = new TelegramClient({
+    accessToken: Env.get('TELEGRAM_TOKEN'),
+})
+const CHAT_IDS = Env.get('TELEGRAM_CHAT_IDS').split(",")
 
 /**
  * Sample job consumer class
@@ -20,7 +33,7 @@ class TDSequentialJob {
      * @return {Int} Num of jobs processed at time
      */
     static get concurrency() {
-        return 25;
+        return 10;
     }
 
     /**
@@ -55,21 +68,35 @@ class TDSequentialJob {
     }
 
     /**
-     * Handle the sending of email data
-     * You can drop the async keyword if it is synchronous
+     *
+     * Take asset from strategy
+     * Connect to user's Binance account
+     * Analyze data
+     * Buy or Sell asset
      */
     async handle() {
-        /**
-         * TODO
-         * 3. Connect to user's Binance account
-         * 4. Take asset from strategy
-         * 5. Buy or Sell asset
-         */
-
         console.group('TdSequential strategy started')
-        // Get first portfolio.
-        // We do this only now for test purposes, this is a big security risk
-        const account = await Account.firstOrFail()
+        const strategy = await Strategy.findOrFail(this.data.strategy.id)
+
+        //Retrieve asset
+        const asset = await strategy.asset().fetch()
+        const firstCoin = await asset.firstCoin()
+        const secondCoin = await asset.secondCoin()
+        const assetName = firstCoin.symbol + '' + secondCoin.symbol
+        console.info('Asset: ', assetName)
+
+        // Get the account associated with the strategy
+        const account = await strategy.account().fetch()
+        console.info('Account: ', account.name)
+
+        // Get user
+        const user = await account.user().fetch()
+        console.info('User: ', user.username, account.api_key)
+
+        // Retrieve the timeframe of the strategy
+        let timeframe = await strategy.timeframe().fetch()
+        timeframe = timeframe.value + '' + timeframe.range
+        console.info('Timeframe: ', timeframe)
 
         // Initialize binance api
         const binance = new Binance().options({
@@ -78,7 +105,14 @@ class TDSequentialJob {
         });
 
         // Get last 500 daily ticks from binance
-        let ticks = await binance.candlesticks("BTCUSDT", "1d", null, {limit: 200})
+        let ticks
+        try {
+            ticks = await binance.candlesticks(assetName, timeframe, null, {limit: 200})
+        } catch (e) {
+            console.error('ERROR: ', e)
+            return
+        }
+
 
         // map ticks in ohlc format
         ticks = ticks.map(function (tick, index) {
@@ -100,84 +134,145 @@ class TDSequentialJob {
 
         // Take the previous td since the last one is the current tick
         // so we need its timeframe to close in order to correctly elaborate the data
-        let secondLastTD = tdSequential.reverse()[1]
-        console.info('TD Sequential of second last day: ', secondLastTD)
+        let lastTD = tdSequential.reverse()[0]
+        console.info('TD Sequential of second last day: ', lastTD)
+
+        //Prepare the message to send on telegram with the strategy log
+        let messageData = 'Strategy: ' + strategy.name + '\n'
+            + 'Indicator: TD Sequential Basic' + '\n'
+            + 'Asset: ' + assetName + '\n'
+            + 'Account: ' + account.name + '\n'
+            + 'Timeframe: ' + timeframe + '\n'
 
         // We will check all condition and set the result (if to sell or not) in this boolean
         // If at the end of all check this variable will still be null then we don't do anything
         let SELL = null
-
-        if (secondLastTD.bullishFlip || secondLastTD.buySetupPerfection) {
-            console.log('BUY: lastTD.bullishFlip || lastTD.buySetupPerfection')
+        if (lastTD.bullishFlip || lastTD.buySetupPerfection) {
+            messageData += '\n BUY: lastTD.bullishFlip || lastTD.buySetupPerfection'
+            console.info('BUY: lastTD.bullishFlip || lastTD.buySetupPerfection')
             SELL = false
         }
 
-        if (secondLastTD.bearishFlip || secondLastTD.sellSetupPerfection) {
-            console.log('SELL: lastTD.bearishFlip || lastTD.sellSetupPerfection')
+        if (lastTD.bearishFlip || lastTD.sellSetupPerfection) {
+            messageData += '\n SELL: secondLastTD.bearishFlip || secondLastTD.sellSetupPerfection'
+            console.info('SELL: lastTD.bearishFlip || lastTD.sellSetupPerfection')
             SELL = true
         }
 
         // If it's a green two upon a green one
-        if (secondLastTD.buySetupIndex === 2 && (lastWeekTicks[1].close > lastWeekTicks[2].close)) {
-            console.log('BUY: lastTD.sellSetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)')
+        if (lastTD.buySetupIndex === 2 && (lastWeekTicks[1].close > lastWeekTicks[2].close)) {
+            messageData += '\n BUY: it\'s a green two upon a green one'
+            console.info('BUY: lastTD.sellSetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)')
             SELL = false
         }
 
         // If it's a red two under a red one
-        if (secondLastTD.sellSetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)) {
-            console.log('SELL: lastTD.buySetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)')
+        if (lastTD.sellSetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)) {
+            messageData += '\n SELL: it\'s a red two under a red one'
+            console.info('SELL: lastTD.buySetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)')
             SELL = true
         }
 
+        // If it's a green 9  then sell (or better: if yesterday was a green 8 then sell today)
+        if (lastTD.sellCoundownIndex === 8) {
+            messageData += '\n SELL: it\'s a green 9'
+            console.info('SELL: secondLastTD.sellCoundownIndex')
+            SELL = true
+        }
+
+        // Log data and SELL result to db
+        await this.logStrategy(strategy, lastWeekTicks, lastTD, SELL)
+
         if (SELL === null) {
+            messageData += '\n FINAL ACTION: Match not found, no actions required.'
             console.info('FINAL ACTION: Match not found, no actions required.')
+            await this.sendTelegramMessage(messageData, user)
             console.groupEnd()
             return false
         }
 
         // Log everything but sell on binance only if env is set to "production"
         const env = Env.get('NODE_ENV', 'development')
-        // TODO:Log data and SELL result to db
+
+        //TODO: gestire quantity, parto con dollari e quantiti è 20,
+        // poi però compro btc e quantity è 0.001 btc poi rivendo...
+        // Quindi non cambia solo il valore di quantity ma cambia anche il valore di cosa rappresenta la quantity
+        let quantity = 1;
 
         if (SELL) {
+            messageData += '\n FINAL ACTION: SELL'
             console.info('FINAL ACTION: SELL')
             if (env === 'production') {
-                //TODO: gestire quantity, parto con dollari e quantiti è 20,
-                // poi però compro btc e quantity è 0.001 btc poi rivendo...
-                // Quindi non cambia solo il valore di quantity ma cambia anche il valore di cosa rappresenta la quantity
-                let quantity = 1;
-
                 // These orders will be executed at current market price.
-                binance.marketSell("BTCUSDT", quantity, (error, response) => {
+                // TODO: place real order
+                binance.marketSell(assetName, quantity, (error, response) => {
                     console.info("Market Buy response", response);
                     console.info("order id: " + response.orderId);
 
                     // TODO:Log the trade
                 })
             } else {
-                // TODO:Fake log sell
+                // Fake log sell
+                await this.logTrade(strategy, 'SELL', quantity, 0)
+                messageData += '\n FAKE SOLD AT $$$'
             }
         } else {
+            messageData += '\n FINAL ACTION: BUY'
             console.info('FINAL ORDER: BUY')
             if (env === 'production') {
                 let quantity = 1;
                 // These orders will be executed at current market price.
-                binance.marketBuy("BTCUSDT", quantity, (error, response) => {
+                binance.marketBuy(assetName, quantity, (error, response) => {
                     console.info("Market Buy response", response);
                     console.info("order id: " + response.orderId);
 
                     // TODO:Log the trade
                 })
             } else {
-                // TODO:Fake log sell
+                // Fake log buy
+                await this.logTrade(strategy, 'BUY', quantity, 0)
+                messageData += '\n FAKE BOUGHT AT $$$'
             }
         }
 
-
+        await this.sendTelegramMessage(messageData, user)
         console.groupEnd()
     }
 
 
+    logStrategy = async (strategy, lastWeekTicks, secondLastTD, SELL) => {
+        let strategyLog = new StrategyLog()
+        strategyLog.strategy_id = strategy.id
+        strategyLog.data = {
+            lastWeekTicks: lastWeekTicks,
+            secondLastTD: secondLastTD,
+            action: SELL ? 'SELL' : 'BUY'
+        }
+        await strategyLog.save()
+        console.debug('Logged strategy!')
+    }
+
+    logTrade = async (strategy, trade_type, quantity, price) => {
+        let tradeLog = new TradeLog()
+        tradeLog.strategy_id = strategy.id
+        tradeLog.trade_type = trade_type
+        tradeLog.quantity = quantity
+        tradeLog.price = price
+        await tradeLog.save()
+        console.log('Logged Fake BUY!')
+    }
+
+    sendTelegramMessage = async (message, user) => {
+        if (!user.telegram_chat_id) {
+            return
+        }
+
+        // console.log(chatId)
+        await client.sendMessage(user.telegram_chat_id, message, {
+            disableWebPagePreview: true,
+            disableNotification: true,
+        });
+    }
 }
 
 module.exports = TDSequentialJob;

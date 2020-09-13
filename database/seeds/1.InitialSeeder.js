@@ -89,10 +89,6 @@ class InitialSeeder {
             .insert([
                 {
                     first_coin_id: BTC.id,
-                    second_coin_id: ETH.id
-                },
-                {
-                    first_coin_id: BTC.id,
                     second_coin_id: USDT.id
                 },
                 {
@@ -136,39 +132,64 @@ class InitialSeeder {
         await Database.table('timeframes')
             .insert([
                 {
-                    value: '1h',
+                    value: 1,
+                    range: 'h',
                     slug: '1h',
                     description: '1 hour'
                 },
                 {
-                    value: '2h',
+                    value: 2,
+                    range: 'h',
                     slug: '2h',
                     description: '2 hours'
                 },
                 {
-                    value: '3h',
+                    value: 3,
+                    range: 'h',
                     slug: '3h',
                     description: '3 hours'
                 },
                 {
-                    value: '4h',
+                    value: 4,
+                    range: 'h',
                     slug: '4h',
                     description: '4 hours'
                 },
                 {
-                    value: '8h',
+                    value: 8,
+                    range: 'h',
                     slug: '8h',
                     description: '8 hours'
                 },
                 {
-                    value: '12h',
+                    value: 12,
+                    range: 'h',
                     slug: '12h',
                     description: '12 hours'
                 },
                 {
-                    value: '1d',
+                    value: 1,
+                    range: 'd',
                     slug: '1d',
                     description: '1 day'
+                }
+            ])
+
+        /**
+         * Seeding Strategy
+         */
+        console.log('Seeding Test Strategy')
+        await Database.table('strategies')
+            .insert([
+                {
+                    name: 'Td Test Strategy 1D',
+                    coin_pair_id: 1,
+                    indicator_id: 1,
+                    account_id: 1,
+                    timeframe_id: 7,
+                    budget: 0,
+                    balance: 0,
+                    is_active: 1
                 }
             ])
     }

@@ -22,8 +22,12 @@ class Strategy extends Model {
         return this.belongsTo('App/Models/Timeframe', 'timeframe_id', 'id')
     }
 
-    coinPair() {
+    asset() {
         return this.belongsTo('App/Models/CoinPair', 'coin_pair_id', 'id')
+    }
+
+    logs() {
+        return this.hasMany('App/Models/StrategyLog', 'id', 'strategy_id')
     }
 }
 
