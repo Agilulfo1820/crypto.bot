@@ -33,7 +33,7 @@ class TDSequentialJob {
      * @return {Int} Num of jobs processed at time
      */
     static get concurrency() {
-        return 250;
+        return 10;
     }
 
     /**
@@ -87,7 +87,11 @@ class TDSequentialJob {
 
         // Get the account associated with the strategy
         const account = await strategy.account().fetch()
-        console.info('Account: ', account.name, account.api_key)
+        console.info('Account: ', account.name)
+
+        // Get user
+        const user = await account.user().fetch()
+        console.info('User: ', user.username, account.api_key)
 
         // Retrieve the timeframe of the strategy
         let timeframe = await strategy.timeframe().fetch()
@@ -130,8 +134,8 @@ class TDSequentialJob {
 
         // Take the previous td since the last one is the current tick
         // so we need its timeframe to close in order to correctly elaborate the data
-        let secondLastTD = tdSequential.reverse()[1]
-        console.info('TD Sequential of second last day: ', secondLastTD)
+        let lastTD = tdSequential.reverse()[0]
+        console.info('TD Sequential of second last day: ', lastTD)
 
         //Prepare the message to send on telegram with the strategy log
         let messageData = 'Strategy: ' + strategy.name + '\n'
@@ -143,46 +147,46 @@ class TDSequentialJob {
         // We will check all condition and set the result (if to sell or not) in this boolean
         // If at the end of all check this variable will still be null then we don't do anything
         let SELL = null
-        if (secondLastTD.bullishFlip || secondLastTD.buySetupPerfection) {
+        if (lastTD.bullishFlip || lastTD.buySetupPerfection) {
             messageData += '\n BUY: lastTD.bullishFlip || lastTD.buySetupPerfection'
             console.info('BUY: lastTD.bullishFlip || lastTD.buySetupPerfection')
             SELL = false
         }
 
-        if (secondLastTD.bearishFlip || secondLastTD.sellSetupPerfection) {
+        if (lastTD.bearishFlip || lastTD.sellSetupPerfection) {
             messageData += '\n SELL: secondLastTD.bearishFlip || secondLastTD.sellSetupPerfection'
             console.info('SELL: lastTD.bearishFlip || lastTD.sellSetupPerfection')
             SELL = true
         }
 
         // If it's a green two upon a green one
-        if (secondLastTD.buySetupIndex === 2 && (lastWeekTicks[1].close > lastWeekTicks[2].close)) {
+        if (lastTD.buySetupIndex === 2 && (lastWeekTicks[1].close > lastWeekTicks[2].close)) {
             messageData += '\n BUY: it\'s a green two upon a green one'
             console.info('BUY: lastTD.sellSetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)')
             SELL = false
         }
 
         // If it's a red two under a red one
-        if (secondLastTD.sellSetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)) {
+        if (lastTD.sellSetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)) {
             messageData += '\n SELL: it\'s a red two under a red one'
             console.info('SELL: lastTD.buySetupIndex === 2 && (lastWeekTicks[1].close < lastWeekTicks[2].close)')
             SELL = true
         }
 
         // If it's a green 9  then sell (or better: if yesterday was a green 8 then sell today)
-        if (secondLastTD.sellCoundownIndex === 8) {
+        if (lastTD.sellCoundownIndex === 8) {
             messageData += '\n SELL: it\'s a green 9'
             console.info('SELL: secondLastTD.sellCoundownIndex')
             SELL = true
         }
 
         // Log data and SELL result to db
-        await this.logStrategy(strategy, lastWeekTicks, secondLastTD, SELL)
+        await this.logStrategy(strategy, lastWeekTicks, lastTD, SELL)
 
         if (SELL === null) {
             messageData += '\n FINAL ACTION: Match not found, no actions required.'
             console.info('FINAL ACTION: Match not found, no actions required.')
-            await this.sendTelegramMessage(messageData)
+            await this.sendTelegramMessage(messageData, user)
             console.groupEnd()
             return false
         }
@@ -231,7 +235,7 @@ class TDSequentialJob {
             }
         }
 
-        await this.sendTelegramMessage(messageData)
+        await this.sendTelegramMessage(messageData, user)
         console.groupEnd()
     }
 
@@ -258,16 +262,17 @@ class TDSequentialJob {
         console.log('Logged Fake BUY!')
     }
 
-    sendTelegramMessage = async (message) => {
-        for(const chatId of CHAT_IDS) {
-            // console.log(chatId)
-            await client.sendMessage(chatId, message, {
-                disableWebPagePreview: true,
-                disableNotification: true,
-            });
+    sendTelegramMessage = async (message, user) => {
+        if (!user.telegram_chat_id) {
+            return
         }
-    }
 
+        // console.log(chatId)
+        await client.sendMessage(user.telegram_chat_id, message, {
+            disableWebPagePreview: true,
+            disableNotification: true,
+        });
+    }
 }
 
 module.exports = TDSequentialJob;
