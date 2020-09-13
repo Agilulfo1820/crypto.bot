@@ -21,6 +21,7 @@ Use the following template to create a new Unreleased change log.
 -->
 ## [Unreleased]
 ### Added
+- [CB-4](https://drusnac.myjetbrains.com/youtrack/issue/CB-4) Inviare messaggi su Telegram
 
 ### Changed
 
